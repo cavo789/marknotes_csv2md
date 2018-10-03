@@ -2,7 +2,7 @@
 
 CSV to markdown converter
 
-Very straight-forward (=no interface) script for converting a CSV content to a Markdown table.
+Very straight-forward script for converting a CSV content to a Markdown table.
 
 Convert string like
 
@@ -21,18 +21,15 @@ into
 | Row 2-1         | Row 2-2         |
 ```
 
-**Note: there is not yet an interface for this, you'll need to modify the `index.php` script and inject your CSV content.**
+## How to use
 
-Just edit index.php and edit this line:
+Just copy/paste your CSV string into the text box as illustrated here below, choose your delimiter, quotation mark (let empty if none) and your separator (default is |).
 
-```php
-$input = 
-	"Column 1 Header,Column 2 Header\n".
-	"Row 1-1,Row 1-2\n".
-	"Row 2-1,Row 2-2";
-```
+When you've only two records in your csv, you can also activate the `Transpose` feature if you wish a two columns table.
 
-When done run the index.php script and get the content.
+When done, just press on the `Convert` button.
+
+![csv2md](images/csv2md/png)
 
 ## Source
 
@@ -40,7 +37,8 @@ The `CSVTable` has been written by `Matthias Endler` and available on GitHub: ht
 
 The script has been quickly modified for:
 
-* Add a transpose feature
 * Modified for PHP 7 compatibility
+* Add a transpose feature
 * Add the column separator as first / last character of the line
 * Add a space before / after the column separator
+* Add an interface for easily use the conversion tool

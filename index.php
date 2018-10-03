@@ -3,16 +3,21 @@
 declare(strict_types=1);
 
 /**
+ * AUTHOR : AVONTURE Christophe
+ *
+ * Written date : 3 october 2018
+ *
  * CSV to markdown converter.
  * Need to be rework for adding a form where we can specify the input string,
  * delimiters (like "," or ";"), click on a submit button and, thanks to an ajax
  * request, get the result in a dynamic div; without leaving the form.
  *
  * Class "CSVTable" based on https://github.com/mre/CSVTable
+ * 	- Modified for PHP 7 compatibility
  * 	- Add a transpose feature
- *		- Modified for PHP 7 compatibility
- *		- Add the column separator as first / last character of the line
- *		- Add a space before / after the column separator
+ * 	- Add the column separator as first / last character of the line
+ * 	- Add a space before / after the column separator
+ * 	- Add an interface for easily use the conversion tool
  */
 class CSVTable
 {
@@ -159,14 +164,12 @@ class CSVTable
 	private function createSeparator() : string
 	{
 		$output = $this->table_separator . ' ';
-		for ($i = 0; $i < $this->length - 1; ++$i) {
+		for ($i = 0; $i < $this->length; ++$i) {
 			$output .= str_repeat('-', $this->col_widths[$i]);
 			$output .= ' ' . $this->table_separator . ' ';
 		}
-		$last_index = $this->length - 1;
-		$output .= str_repeat('-', $this->col_widths[$last_index]);
 
-		return $output . ' ' . $this->table_separator . "\n";
+		return trim($output) . "\n";
 	}
 
 	protected function createRows(array $rows) : string
@@ -198,16 +201,13 @@ class CSVTable
 		$output = $this->table_separator . ' ';
 		// Only create as many columns as the minimal number of elements
 		// in all rows. Otherwise this would not be a valid Markdown table
-		for ($i = 0; $i < $this->length - 1; ++$i) {
+		for ($i = 0; $i < $this->length; ++$i) {
 			$element = $this->padded(trim($row[$i]), $this->col_widths[$i]);
 			$output .= $element;
 			$output .= ' ' . $this->table_separator . ' ';
 		}
-		// Don't append a separator to the last element
-		$last_index = $this->length - 1;
-		$element = $this->padded($row[$last_index], $this->col_widths[$last_index]);
-		$output .= $element;
-		$output .= ' ' . $this->table_separator . "\n"; // row ends with a newline
+
+		$output = trim($output) . "\n"; // row ends with a newline
 		return $output;
 	}
 
@@ -254,29 +254,133 @@ class CSVTable
 	}
 }
 
-$input =
-	"# tid, participant_id, firstname, lastname, email, emailstatus, token, language, blacklisted, sent, remindersent, remindercount, completed, usesleft, validfrom, validuntil, mpid, attribute_1, attribute_2, attribute_3, attribute_4, attribute_5, attribute_6, attribute_7, attribute_8, attribute_9, attribute_10, attribute_11, attribute_12, attribute_13, attribute_14, attribute_15
-'1', NULL, '', '1', '', 'OK', '448F2zMsawul0xr', 'nl', NULL, 'N', 'N', '0', '2018-09-27 07:44', '0', NULL, NULL, NULL, '2', 'Argus Filch', 'Gilderoy Lockhart', 'Nearly Beheaded Nick', NULL, NULL, NULL, NULL, NULL, 'Nieuwe test', 'Nouveau test', 'admin admin', '20180512', '64290', NULL
-";
+$task = filter_input(INPUT_POST, 'task', FILTER_SANITIZE_STRING);
 
-// Delimiters between columns (, or ; or ...)
+if ($task == 'convert') {
+	// Retrieve the CSV content
+	$csv = base64_decode(filter_input(INPUT_POST, 'csv', FILTER_SANITIZE_STRING));
+
+	// Delimiters between columns (, or ; or ...)
+	$delim = base64_decode(filter_input(INPUT_POST, 'delim', FILTER_SANITIZE_STRING));
+	if (trim($delim) == '') {
+		$delim = ',';
+	}
+
+	// In case of the text are between quotes like, for instance,
+	//   "field1","field2", ...   If so, mention '"' as value for $enclosure
+	$enclosure = base64_decode(filter_input(INPUT_POST, 'enclosure', FILTER_SANITIZE_STRING));
+
+	// Separator to use in markdown to separate columns ('|' is the standard)
+	$separator = base64_decode(filter_input(INPUT_POST, 'separator', FILTER_SANITIZE_STRING));
+	if (trim($separator) == '') {
+		$separator = '|';
+	}
+
+	// Transpose will works ONLY when there is two records in the
+	// input string. Instead of having a long "horizontal" table, convert
+	// the table vertically. The result table will have two columns and as
+	// many rows that there was columns in the string
+	$bTranspose = boolval(filter_input(INPUT_POST, 'transpose', FILTER_VALIDATE_BOOLEAN));
+
+	// Create a new CSV parser
+	$parser = new CSVTable($csv, $delim, $enclosure, $separator, $bTranspose);
+
+	// Create a Markdown table from the parsed input
+	header('Content-Type: text/html');
+	echo $parser->getMarkup();
+
+	die();
+}
+
+// Sample and default values
+$csv =
+	"Column 1 Header,Column 2 Header\n" .
+	"Row 1-1,Row 1-2\n" .
+	'Row 2-1,Row 2-2';
+
 $delim = ',';
-
-// In case of the text are between quotes like, for instance,
-//   "field1","field2", ...   If so, mention '"' as value for $enclosure
-$enclosure = '';
-
-// Separator to use in markdown to separate columns ('|' is the standard)
+$enclosure = ',';
 $separator = '|';
 
-// Transpose will works ONLY when there is two records in the
-// input string. Instead of having a long "horizontal" table, convert
-// the table vertically. The result table will have two columns and as
-// many rows that there was columns in the string
-$bTranspose = true;	// <=== WORKS ONLY if the array has two records
+?>
 
-// Create a new CSV parser
-$parser = new CSVTable($input, $delim, $enclosure, $separator, $bTranspose);
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="author" content="Christophe Avonture" />
+		<meta name="robots" content="noindex, nofollow" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
+		<title>Marknotes - CSV2MD</title>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
+			<div class="container">
 
-// Create a Markdown table from the parsed input
-echo '<pre>' . $parser->getMarkup() . '</pre>';
+				<div class="form-group">
+					<label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
+					<textarea class="form-control" rows="5" id="csv" name="csv"><?php echo $csv; ?></textarea>
+				</div>
+				<div class="row">
+					<form class="form-inline">
+						<div class="form-check mr-sm-3">
+							<input type="checkbox" class="form-check-input" id="transpose">&nbsp;
+							<label class="form-check-label" for="transpose">Transpose</label>
+						</div>
+						<div class=" form-group mr-sm-3">
+							<label for="delim">Delimiter:</label>&nbsp;
+							<input type="text" style="width:50px;" size="3" value="<?php echo $delim;?>" class="form-control" id="delim">
+						</div>
+						<div class=" form-group mr-sm-3">
+							<label for="enclosure">Quote:</label>&nbsp;
+							<input type="text" style="width:50px;" size="3" value="<?php echo $enclosure; ?>" class="form-control" id="enclosure">
+						</div>
+						<div class=" form-group mr-sm-3">
+							<label for="separator">Separator:</label>&nbsp;
+							<input type="text" style="width:50px;" size="3" value="<?php echo $separator; ?>" class="form-control" id="separator">
+						</div>
+					</form>
+				</div>
+				<button type="button" id="btnConvert" class="btn btn-primary">Convert</button>
+				<hr/>
+				<pre id="Result"></pre>
+			</div>
+		</div>
+		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			$('#btnConvert').click(function(e)  {
+
+				e.stopImmediatePropagation();
+
+				var $data = new Object;
+				$data.task = "convert";
+				$data.csv = window.btoa($('#csv').val());
+				$data.transpose = $("#transpose").is(':checked') ? 1 : 0;
+				$data.delim = window.btoa($('#delim').val());
+				$data.enclosure = window.btoa($('#enclosure').val());
+				$data.separator = window.btoa($('#separator').val());
+
+				$.ajax({
+					beforeSend: function() {
+						$('#Result').html('<div><span class="ajax_loading">&nbsp;</span><span style="font-style:italic;font-size:1.5em;">Converting...</span></div>');
+						$('#btnConvert').prop("disabled", true);
+					},
+					async: true,
+					type: "POST",
+					url: "<?php echo basename(__FILE__); ?>",
+					data: $data,
+					datatype: "html",
+					success: function (data) {
+						$('#btnConvert').prop("disabled", false);
+						$('#Result').html(data);
+					}
+				}); // $.ajax()
+			});
+		</script>
+	</body>
+</html>
