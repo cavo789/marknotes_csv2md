@@ -29,7 +29,7 @@ When you've only two records in your csv, you can also activate the `Transpose` 
 
 When done, just press on the `Convert` button.
 
-![csv2md](images/csv2md/png)
+![csv2md](images/csv2md.png)
 
 ## Source
 
