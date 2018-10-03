@@ -40,6 +40,7 @@ The `CSVTable` has been written by `Matthias Endler` and available on GitHub: ht
 
 The script has been quickly modified for:
 
+* Add a transpose feature
 * Modified for PHP 7 compatibility
 * Add the column separator as first / last character of the line
 * Add a space before / after the column separator
