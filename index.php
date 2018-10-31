@@ -19,6 +19,9 @@ declare(strict_types=1);
  * 	- Add a space before / after the column separator
  * 	- Add an interface for easily use the conversion tool
  */
+
+define('REPO', 'https://github.com/cavo789/marknotes_csv2md');
+
 class CSVTable
 {
 	public function __construct(
@@ -302,6 +305,11 @@ $delim = ',';
 $enclosure = ',';
 $separator = '|';
 
+// Get the GitHub corner
+$github = '';
+if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
+	$github = str_replace('%REPO%', REPO, file_get_contents($cat));
+}
 ?>
 
 <!DOCTYPE html>
@@ -317,6 +325,7 @@ $separator = '|';
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 	</head>
 	<body>
+		<?php echo $github; ?>
 		<div class="container">
 			<div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
 			<div class="container">
