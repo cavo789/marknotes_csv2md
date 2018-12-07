@@ -13,11 +13,11 @@ declare(strict_types = 1);
  * request, get the result in a dynamic div; without leaving the form.
  *
  * Class "CSVTable" based on https://github.com/mre/CSVTable
- * 	- Modified for PHP 7 compatibility
- * 	- Add a transpose feature
- * 	- Add the column separator as first / last character of the line
- * 	- Add a space before / after the column separator
- * 	- Add an interface for easily use the conversion tool
+ *     - Modified for PHP 7 compatibility
+ *     - Add a transpose feature
+ *     - Add the column separator as first / last character of the line
+ *     - Add a space before / after the column separator
+ *     - Add an interface for easily use the conversion tool
  */
 
 define('REPO', 'https://github.com/cavo789/marknotes_csv2md');
@@ -37,8 +37,8 @@ class CSVTable
         $this->table_separator = $table_separator;
 
         // Fill the rows with Markdown output
-        $this->header = ''; 	// Table header
-        $this->rows   = ''; 	// Table rows
+        $this->header = '';     // Table header
+        $this->rows   = '';     // Table rows
 
         $this->CSVtoTable($transpose);
     }
@@ -101,21 +101,21 @@ class CSVTable
      * the answer.
      *
      * $in = [
-     * 	'User1' => [
-     * 		'Question1' => 'Answer User1 - Q1',
-     * 		'Question2' => 'Answer User1 - Q2',
-     * 		'Question3' => 'Answer User1 - Q3'
-     * 	],
-     * 	'User2' => [
-     * 		'Question1' => 'Answer User2 - Q1',
-     * 		'Question2' => 'Answer User2 - Q2',
-     * 		'Question3' => 'Answer User2 - Q3'
-     * 	],
-     * 	'User3' => [
-     * 		'Question1' => 'Answer User3 - Q1',
-     * 		'Question2' => 'Answer User3 - Q2',
-     * 		'Question3' => 'Answer User3 - Q3'
-     * 	]
+     *     'User1' => [
+     *         'Question1' => 'Answer User1 - Q1',
+     *         'Question2' => 'Answer User1 - Q2',
+     *         'Question3' => 'Answer User1 - Q3'
+     *     ],
+     *     'User2' => [
+     *         'Question1' => 'Answer User2 - Q1',
+     *         'Question2' => 'Answer User2 - Q2',
+     *         'Question3' => 'Answer User2 - Q3'
+     *     ],
+     *     'User3' => [
+     *         'Question1' => 'Answer User3 - Q1',
+     *         'Question2' => 'Answer User3 - Q2',
+     *         'Question3' => 'Answer User3 - Q3'
+     *     ]
      * ];
      *
      * We can transpose the array to have first the question then
@@ -128,22 +128,22 @@ class CSVTable
      * This will give:
      *
      * $out = [
-     *		'Question1' => [
-     *			'User1' => 'Answer User1 - Q1',
-     *			'User2' => 'Answer User2 - Q1',
-     *			'User3' => 'Answer User3 - Q1'
-     *		],
-     *		'Question2' => [
-     *			'User1' => 'Answer User1 - Q2',
-     *			'User2' => 'Answer User2 - Q2',
-     *			'User3' => 'Answer User3 - Q2'
-     *		],
-     *		'Question3' => [
-     *			'User1' => 'Answer User1 - Q3',
-     *			'User2' => 'Answer User2 - Q3',
-     *			'User3' => 'Answer User3 - Q3'
-     *		]
-     *	]
+     *        'Question1' => [
+     *            'User1' => 'Answer User1 - Q1',
+     *            'User2' => 'Answer User2 - Q1',
+     *            'User3' => 'Answer User3 - Q1'
+     *        ],
+     *        'Question2' => [
+     *            'User1' => 'Answer User1 - Q2',
+     *            'User2' => 'Answer User2 - Q2',
+     *            'User3' => 'Answer User3 - Q2'
+     *        ],
+     *        'Question3' => [
+     *            'User1' => 'Answer User1 - Q3',
+     *            'User2' => 'Answer User2 - Q3',
+     *            'User3' => 'Answer User3 - Q3'
+     *        ]
+     *    ]
      *
      *
      * @see https://stackoverflow.com/questions/797251/transposing-multidimensional-arrays-in-php/797268#797268
@@ -315,100 +315,100 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
 
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8"/>
-		<meta name="author" content="Christophe Avonture" />
-		<meta name="robots" content="noindex, nofollow" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
-		<title>Marknotes - CSV2MD</title>
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-	</head>
-	<body>
-		<?php echo $github; ?>
-		<div class="container">
-			<div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
-			<div class="container">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="author" content="Christophe Avonture" />
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
+        <title>Marknotes - CSV2MD</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    </head>
+    <body>
+        <?php echo $github; ?>
+        <div class="container">
+            <div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
+            <div class="container">
 
-				<div class="form-group">
-					<details>
-						<summary>How to use?</summary>
+                <div class="form-group">
+                    <details>
+                        <summary>How to use?</summary>
 
-						<div class="row">
-								<div class="col-sm">
-									<ul>
-										<li>Copy/Paste your CSV content in the textbox below</li>
-										<li>Update one or more options</li>
-										<li>If you've only two lines, you can select Transpose</li>
-										<li>Click on the Convert button</li>
-									</ul>
-								</div>
-								<div class="col-sm">
-									<img height="300px" src="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif" alt="Demo">
-								</div>
-							</div>
-						</div>
-					</details>
-					<label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
-					<textarea class="form-control" rows="5" id="csv" name="csv"><?php echo $csv; ?></textarea>
-				</div>
-				<div class="row">
-					<form class="form-inline">
-						<div class="form-check mr-sm-3">
-							<input type="checkbox" class="form-check-input" id="transpose">&nbsp;
-							<label class="form-check-label" for="transpose">Transpose</label>
-						</div>
-						<div class=" form-group mr-sm-3">
-							<label for="delim">Delimiter:</label>&nbsp;
-							<input type="text" style="width:50px;" size="3" value="<?php echo $delim;?>" class="form-control" id="delim">
-						</div>
-						<div class=" form-group mr-sm-3">
-							<label for="enclosure">Quote:</label>&nbsp;
-							<input type="text" style="width:50px;" size="3" value="<?php echo $enclosure; ?>" class="form-control" id="enclosure">
-						</div>
-						<div class=" form-group mr-sm-3">
-							<label for="separator">Separator:</label>&nbsp;
-							<input type="text" style="width:50px;" size="3" value="<?php echo $separator; ?>" class="form-control" id="separator">
-						</div>
-					</form>
-				</div>
-				<button type="button" id="btnConvert" class="btn btn-primary">Convert</button>
-				<hr/>
-				<pre id="Result"></pre>
-			</div>
-		</div>
-		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-		<script type="text/javascript">
-			$('#btnConvert').click(function(e)  {
+                        <div class="row">
+                                <div class="col-sm">
+                                    <ul>
+                                        <li>Copy/Paste your CSV content in the textbox below</li>
+                                        <li>Update one or more options</li>
+                                        <li>If you've only two lines, you can select Transpose</li>
+                                        <li>Click on the Convert button</li>
+                                    </ul>
+                                </div>
+                                <div class="col-sm">
+                                    <img src="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif" alt="Demo">
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+                    <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
+                    <textarea class="form-control" rows="5" id="csv" name="csv"><?php echo $csv; ?></textarea>
+                </div>
+                <div class="row">
+                    <form class="form-inline">
+                        <div class="form-check mr-sm-3">
+                            <input type="checkbox" class="form-check-input" id="transpose">&nbsp;
+                            <label class="form-check-label" for="transpose">Transpose</label>
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="delim">Delimiter:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" value="<?php echo $delim;?>" class="form-control" id="delim">
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="enclosure">Quote:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" value="<?php echo $enclosure; ?>" class="form-control" id="enclosure">
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="separator">Separator:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" value="<?php echo $separator; ?>" class="form-control" id="separator">
+                        </div>
+                    </form>
+                </div>
+                <button type="button" id="btnConvert" class="btn btn-primary">Convert</button>
+                <hr/>
+                <pre id="Result"></pre>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+        <script type="text/javascript">
+            $('#btnConvert').click(function(e)  {
 
-				e.stopImmediatePropagation();
+                e.stopImmediatePropagation();
 
-				var $data = new Object;
-				$data.task = "convert";
-				$data.csv = window.btoa($('#csv').val());
-				$data.transpose = $("#transpose").is(':checked') ? 1 : 0;
-				$data.delim = window.btoa($('#delim').val());
-				$data.enclosure = window.btoa($('#enclosure').val());
-				$data.separator = window.btoa($('#separator').val());
+                var $data = new Object;
+                $data.task = "convert";
+                $data.csv = window.btoa($('#csv').val());
+                $data.transpose = $("#transpose").is(':checked') ? 1 : 0;
+                $data.delim = window.btoa($('#delim').val());
+                $data.enclosure = window.btoa($('#enclosure').val());
+                $data.separator = window.btoa($('#separator').val());
 
-				$.ajax({
-					beforeSend: function() {
-						$('#Result').html('<div><span class="ajax_loading">&nbsp;</span><span style="font-style:italic;font-size:1.5em;">Converting...</span></div>');
-						$('#btnConvert').prop("disabled", true);
-					},
-					async: true,
-					type: "POST",
-					url: "<?php echo basename(__FILE__); ?>",
-					data: $data,
-					datatype: "html",
-					success: function (data) {
-						$('#btnConvert').prop("disabled", false);
-						$('#Result').html(data);
-					}
-				}); // $.ajax()
-			});
-		</script>
-	</body>
+                $.ajax({
+                    beforeSend: function() {
+                        $('#Result').html('<div><span class="ajax_loading">&nbsp;</span><span style="font-style:italic;font-size:1.5em;">Converting...</span></div>');
+                        $('#btnConvert').prop("disabled", true);
+                    },
+                    async: true,
+                    type: "POST",
+                    url: "<?php echo basename(__FILE__); ?>",
+                    data: $data,
+                    datatype: "html",
+                    success: function (data) {
+                        $('#btnConvert').prop("disabled", false);
+                        $('#Result').html(data);
+                    }
+                });
+            });
+        </script>
+    </body>
 </html>
