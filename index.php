@@ -355,12 +355,12 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                 <button type="button" @click="doConvert" class="btn btn-primary">Convert</button>
                 <hr/>
                 <div v-if="Markdown!==''">
-                    <h2 id="markdown">Markdown code</h2><a href="#html">See HTML rendering</a>
+                    <h2 id="markdown">Markdown code <small style="font-size:0.4em"><a href="#html">See HTML rendering</a></small></h2>
                     <pre v-html="Markdown"></pre>
                     <hr/>
                 </div>
                 <div v-if="HTML!==''">
-                    <h2 id="html">HTML rendering</h2><a href="#markdown">See Markdown code</a>
+                    <h2 id="html">HTML rendering <small style="font-size:0.4em"><a href="#markdown">See Markdown code</a></small></h2>
                     <pre v-html="HTML"></pre>
                     <hr/>
                 </div>
