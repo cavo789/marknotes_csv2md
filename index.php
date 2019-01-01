@@ -18,6 +18,9 @@ declare(strict_types = 1);
  *     - Add the column separator as first / last character of the line
  *     - Add a space before / after the column separator
  *     - Add an interface for easily use the conversion tool
+ *
+ * Last mod:
+ * 2019-01-01 - Abandonment of jQuery and migration to vue.js
  */
 
 define('REPO', 'https://github.com/cavo789/marknotes_csv2md');
@@ -258,53 +261,47 @@ class CSVTable
     }
 }
 
-$task = filter_input(INPUT_POST, 'task', FILTER_SANITIZE_STRING);
+// Retrieve posted data
+$data = json_decode(file_get_contents('php://input'), true);
+if ($data !== []) {
+    $task = filter_var(($data['task'] ?? ''), FILTER_SANITIZE_STRING);
 
-if ('convert' == $task) {
-    // Retrieve the CSV content
-    $csv = base64_decode(filter_input(INPUT_POST, 'csv', FILTER_SANITIZE_STRING));
+    if ('convert' == $task) {
+        // Retrieve the CSV content
+        $csv = base64_decode(filter_var(($data['csv'] ?? ''), FILTER_SANITIZE_STRING));
 
-    // Delimiters between columns (, or ; or ...)
-    $delim = base64_decode(filter_input(INPUT_POST, 'delim', FILTER_SANITIZE_STRING));
-    if ('' == trim($delim)) {
-        $delim = ',';
+        // Delimiters between columns (, or ; or ...)
+        $delim = base64_decode($data['delim'] ?? '');
+        if ('' == trim($delim)) {
+            $delim = ',';
+        }
+
+        // In case of the text are between quotes like, for instance,
+        //   "field1","field2", ...   If so, mention '"' as value for $enclosure
+        $enclosure = base64_decode($data['enclosure'] ?? '');
+
+        // Separator to use in markdown to separate columns ('|' is the standard)
+        $separator = base64_decode($data['separator'] ?? '');
+
+        if ('' == trim($separator)) {
+            $separator = '|';
+        }
+
+        // Transpose will works ONLY when there is two records in the
+        // input string. Instead of having a long "horizontal" table, convert
+        // the table vertically. The result table will have two columns and as
+        // many rows that there was columns in the string
+        $bTranspose = boolval(filter_var(($data['transpose'] ?? ''), FILTER_VALIDATE_BOOLEAN));
+
+        // Create a new CSV parser
+        $parser = new CSVTable($csv, $delim, $enclosure, $separator, $bTranspose);
+
+        // Create a Markdown table from the parsed input
+        header('Content-Type: text/plain');
+        echo base64_encode($parser->getMarkup());
+        die();
     }
-
-    // In case of the text are between quotes like, for instance,
-    //   "field1","field2", ...   If so, mention '"' as value for $enclosure
-    $enclosure = base64_decode(filter_input(INPUT_POST, 'enclosure', FILTER_SANITIZE_STRING));
-
-    // Separator to use in markdown to separate columns ('|' is the standard)
-    $separator = base64_decode(filter_input(INPUT_POST, 'separator', FILTER_SANITIZE_STRING));
-    if ('' == trim($separator)) {
-        $separator = '|';
-    }
-
-    // Transpose will works ONLY when there is two records in the
-    // input string. Instead of having a long "horizontal" table, convert
-    // the table vertically. The result table will have two columns and as
-    // many rows that there was columns in the string
-    $bTranspose = boolval(filter_input(INPUT_POST, 'transpose', FILTER_VALIDATE_BOOLEAN));
-
-    // Create a new CSV parser
-    $parser = new CSVTable($csv, $delim, $enclosure, $separator, $bTranspose);
-
-    // Create a Markdown table from the parsed input
-    header('Content-Type: text/html');
-    echo $parser->getMarkup();
-
-    die();
 }
-
-// Sample and default values
-$csv =
-    "Column 1 Header,Column 2 Header\n" .
-    "Row 1-1,Row 1-2\n" .
-    'Row 2-1,Row 2-2';
-
-$delim     = ',';
-$enclosure = ',';
-$separator = '|';
 
 // Get the GitHub corner
 $github = '';
@@ -329,12 +326,51 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
         <?php echo $github; ?>
         <div class="container">
             <div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
-            <div class="container">
-
+            <div class="container" id="app">
                 <div class="form-group">
-                    <details>
-                        <summary>How to use?</summary>
+                    <how-to-use demo="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif"></how-to-use>                    
+                    <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
+                    <textarea class="form-control" rows="5" v-model="CSV" name="csv"></textarea>
+                </div>
+                <div class="row">
+                    <form class="form-inline">
+                        <div class="form-check mr-sm-3">
+                            <input type="checkbox" class="form-check-input" v-model="transpose">&nbsp;
+                            <label class="form-check-label" for="transpose">Transpose</label>
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="delim">Delimiter:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="delim" class="form-control">
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="enclosure">Quote:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="enclosure" class="form-control">
+                        </div>
+                        <div class=" form-group mr-sm-3">
+                            <label for="separator">Separator:</label>&nbsp;
+                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="separator" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <button type="button" @click="doConvert" class="btn btn-primary">Convert</button>
+                <hr/>
+                <pre v-html="HTML"></pre>
+            </div>
+        </div>
 
+        <script src="https://unpkg.com/vue"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script type="text/javascript">
+            Vue.component('how-to-use', {
+                props: {
+                    demo: {
+                        type: String,
+                        required: true
+                    }
+                },
+                template:
+                    `<details>
+                        <summary>How to use?</summary>
                         <div class="row">
                                 <div class="col-sm">
                                     <ul>
@@ -344,70 +380,39 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                                         <li>Click on the Convert button</li>
                                     </ul>
                                 </div>
-                                <div class="col-sm">
-                                    <img src="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif" alt="Demo">
-                                </div>
+                                <div class="col-sm"><img v-bind:src="demo" alt="Demo"></div>
                             </div>
                         </div>
-                    </details>
-                    <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
-                    <textarea class="form-control" rows="5" id="csv" name="csv"><?php echo $csv; ?></textarea>
-                </div>
-                <div class="row">
-                    <form class="form-inline">
-                        <div class="form-check mr-sm-3">
-                            <input type="checkbox" class="form-check-input" id="transpose">&nbsp;
-                            <label class="form-check-label" for="transpose">Transpose</label>
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="delim">Delimiter:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" value="<?php echo $delim;?>" class="form-control" id="delim">
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="enclosure">Quote:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" value="<?php echo $enclosure; ?>" class="form-control" id="enclosure">
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="separator">Separator:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" value="<?php echo $separator; ?>" class="form-control" id="separator">
-                        </div>
-                    </form>
-                </div>
-                <button type="button" id="btnConvert" class="btn btn-primary">Convert</button>
-                <hr/>
-                <pre id="Result"></pre>
-            </div>
-        </div>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-        <script type="text/javascript">
-            $('#btnConvert').click(function(e)  {
+                    </details>`
+            });
 
-                e.stopImmediatePropagation();
-
-                var $data = new Object;
-                $data.task = "convert";
-                $data.csv = window.btoa($('#csv').val());
-                $data.transpose = $("#transpose").is(':checked') ? 1 : 0;
-                $data.delim = window.btoa($('#delim').val());
-                $data.enclosure = window.btoa($('#enclosure').val());
-                $data.separator = window.btoa($('#separator').val());
-
-                $.ajax({
-                    beforeSend: function() {
-                        $('#Result').html('<div><span class="ajax_loading">&nbsp;</span><span style="font-style:italic;font-size:1.5em;">Converting...</span></div>');
-                        $('#btnConvert').prop("disabled", true);
-                    },
-                    async: true,
-                    type: "POST",
-                    url: "<?php echo basename(__FILE__); ?>",
-                    data: $data,
-                    datatype: "html",
-                    success: function (data) {
-                        $('#btnConvert').prop("disabled", false);
-                        $('#Result').html(data);
+            var app = new Vue({
+                el: '#app',
+                data: {
+                    CSV: "Column 1 Header,Column 2 Header\n" +
+                        "Row 1-1,Row 1-2\n" +
+                        "Row 2-1,Row 2-2",
+                    transpose: false,
+                    delim: ',',
+                    enclosure: '"',
+                    separator: '|',
+                    HTML: ''
+                },
+                methods: {
+                    doConvert() {
+                        var $data = {
+                            task: 'convert',
+                            csv: window.btoa(this.CSV),
+                            transpose: this.transpose,
+                            delim: window.btoa(this.delim),
+                            enclosure: window.btoa(this.enclosure),
+                            separator: window.btoa(this.separator)
+                        }
+                        axios.post('<?php echo basename(__FILE__); ?>', $data)
+                            .then(response => (this.HTML = window.atob(response.data)))
+                            .catch(function (error) {console.log(error);});
                     }
-                });
+                }
             });
         </script>
     </body>
