@@ -37,10 +37,11 @@ When done, just press on the `Convert` button.
 
 The `CSVTable` has been written by `Matthias Endler` and available on GitHub: https://github.com/mre/CSVTable.
 
-The script has been quickly modified for:
+The script has been modified for:
 
 * Modified for PHP 7 compatibility
 * Add a transpose feature
 * Add the column separator as first / last character of the line
 * Add a space before / after the column separator
 * Add an interface for easily use the conversion tool
+* HTML preview

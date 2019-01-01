@@ -354,12 +354,22 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                 </div>
                 <button type="button" @click="doConvert" class="btn btn-primary">Convert</button>
                 <hr/>
-                <pre v-html="HTML"></pre>
+                <div v-if="Markdown!==''">
+                    <h2 id="markdown">Markdown code</h2><a href="#html">See HTML rendering</a>
+                    <pre v-html="Markdown"></pre>
+                    <hr/>
+                </div>
+                <div v-if="HTML!==''">
+                    <h2 id="html">HTML rendering</h2><a href="#markdown">See Markdown code</a>
+                    <pre v-html="HTML"></pre>
+                    <hr/>
+                </div>
             </div>
         </div>
 
         <script src="https://unpkg.com/vue"></script>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://unpkg.com/marked@0.3.6"></script>
         <script type="text/javascript">
             Vue.component('how-to-use', {
                 props: {
@@ -396,7 +406,7 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                     delim: ',',
                     enclosure: '"',
                     separator: '|',
-                    HTML: ''
+                    Markdown: ''
                 },
                 methods: {
                     doConvert() {
@@ -409,8 +419,20 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                             separator: window.btoa(this.separator)
                         }
                         axios.post('<?php echo basename(__FILE__); ?>', $data)
-                            .then(response => (this.HTML = window.atob(response.data)))
+                            .then(response => (this.Markdown = window.atob(response.data)))
                             .catch(function (error) {console.log(error);});
+                    }
+                },
+                computed: {
+                    HTML() {
+                        if (this.Markdown == '') {
+                            return '';
+                        }
+                        // Call marked() to convert the MD string into a HTML table
+                        var mdTable = marked(this.Markdown, { sanitize: true });
+                        // Add Boostrap classes
+                        mdTable = mdTable.replace('<table>', '<table class="table table-hover table-striped">');
+                        return mdTable;
                     }
                 }
             });
