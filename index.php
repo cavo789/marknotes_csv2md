@@ -328,7 +328,14 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
             <div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
             <div class="container" id="app">
                 <div class="form-group">
-                    <how-to-use demo="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif"></how-to-use>                    
+                    <how-to-use demo="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif">
+                        <ul>
+                            <li>Copy/Paste your CSV content in the textbox below</li>
+                            <li>Update one or more options</li>
+                            <li>If you've only two lines, you can select Transpose</li>
+                            <li>Click on the Convert button</li>
+                        </ul>
+                    </how-to-use>
                     <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
                     <textarea class="form-control" rows="5" v-model="CSV" name="csv"></textarea>
                 </div>
@@ -383,12 +390,7 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                         <summary>How to use?</summary>
                         <div class="row">
                                 <div class="col-sm">
-                                    <ul>
-                                        <li>Copy/Paste your CSV content in the textbox below</li>
-                                        <li>Update one or more options</li>
-                                        <li>If you've only two lines, you can select Transpose</li>
-                                        <li>Click on the Convert button</li>
-                                    </ul>
+                                    <slot></slot>
                                 </div>
                                 <div class="col-sm"><img v-bind:src="demo" alt="Demo"></div>
                             </div>
