@@ -80,81 +80,84 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
 
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8"/>
-        <meta name="author" content="Christophe Avonture" />
-        <meta name="robots" content="noindex, nofollow" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
-        <title>Marknotes - CSV2MD</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    </head>
-    <body>
-        <?php echo $github; ?>
-        <div class="container">
-            <div class="page-header"><h1>Marknotes - CSV2MD</h1></div>
-            <div class="container" id="app">
-                <div class="form-group">
-                    <how-to-use demo="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif">
-                        <ul>
-                            <li>Copy/Paste your CSV content in the textbox below</li>
-                            <li>Update one or more options</li>
-                            <li>If you've only two lines, you can select Transpose</li>
-                            <li>Click on the Convert button</li>
-                        </ul>
-                    </how-to-use>
-                    <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
-                    <textarea class="form-control" rows="5" v-model="CSV" name="csv"></textarea>
-                </div>
-                <div class="row">
-                    <form class="form-inline">
-                        <div class="form-check mr-sm-3">
-                            <input type="checkbox" class="form-check-input" v-model="transpose">&nbsp;
-                            <label class="form-check-label" for="transpose">Transpose</label>
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="delim">Delimiter:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="delim" class="form-control">
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="enclosure">Quote:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="enclosure" class="form-control">
-                        </div>
-                        <div class=" form-group mr-sm-3">
-                            <label for="separator">Separator:</label>&nbsp;
-                            <input type="text" style="width:50px;" size="3" maxlength="3" v-model="separator" class="form-control">
-                        </div>
-                    </form>
-                </div>
-                <button type="button" @click="doConvert" class="btn btn-primary">Convert</button>
-                <hr/>
-                <div v-if="Markdown!==''">
-                    <h2 id="markdown">Markdown code <small style="font-size:0.4em"><a href="#html">See HTML rendering</a></small></h2>
-                    <pre v-html="Markdown"></pre>
-                    <hr/>
-                </div>
-                <div v-if="HTML!==''">
-                    <h2 id="html">HTML rendering <small style="font-size:0.4em"><a href="#markdown">See Markdown code</a></small></h2>
-                    <pre v-html="HTML"></pre>
-                    <hr/>
-                </div>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Christophe Avonture" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
+    <title>Marknotes - CSV2MD</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+
+<body>
+    <?php echo $github; ?>
+    <div class="container">
+        <div class="page-header">
+            <h1>Marknotes - CSV2MD</h1>
+        </div>
+        <div class="container" id="app">
+            <div class="form-group">
+                <how-to-use demo="https://raw.githubusercontent.com/cavo789/marknotes_csv2md/master/images/demo.gif">
+                    <ul>
+                        <li>Copy/Paste your CSV content in the textbox below</li>
+                        <li>Update one or more options</li>
+                        <li>If you've only two lines, you can select Transpose</li>
+                        <li>Click on the Convert button</li>
+                    </ul>
+                </how-to-use>
+                <label for="csv">Copy/Paste your CSV content in the textbox below then click on the Convert button:</label>
+                <textarea class="form-control" rows="5" v-model="CSV" name="csv" @paste="doChangeTabByComma"></textarea>
+            </div>
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-check mr-sm-3">
+                        <input type="checkbox" class="form-check-input" v-model="transpose">&nbsp;
+                        <label class="form-check-label" for="transpose">Transpose</label>
+                    </div>
+                    <div class=" form-group mr-sm-3">
+                        <label for="delim">Delimiter:</label>&nbsp;
+                        <input type="text" style="width:50px;" size="3" maxlength="3" v-model="delim" class="form-control">
+                    </div>
+                    <div class=" form-group mr-sm-3">
+                        <label for="enclosure">Quote:</label>&nbsp;
+                        <input type="text" style="width:50px;" size="3" maxlength="3" v-model="enclosure" class="form-control">
+                    </div>
+                    <div class=" form-group mr-sm-3">
+                        <label for="separator">Separator:</label>&nbsp;
+                        <input type="text" style="width:50px;" size="3" maxlength="3" v-model="separator" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <button type="button" @click="doConvert" class="btn btn-primary">Convert</button>
+            <hr />
+            <div v-if="Markdown!==''">
+                <h2 id="markdown">Markdown code <small style="font-size:0.4em"><a href="#html">See HTML rendering</a></small></h2>
+                <pre v-html="Markdown"></pre>
+                <hr />
+            </div>
+            <div v-if="HTML!==''">
+                <h2 id="html">HTML rendering <small style="font-size:0.4em"><a href="#markdown">See Markdown code</a></small></h2>
+                <pre v-html="HTML"></pre>
+                <hr />
             </div>
         </div>
+    </div>
 
-        <script src="https://unpkg.com/vue"></script>
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/marked@0.3.6"></script>
-        <script type="text/javascript">
-            Vue.component('how-to-use', {
-                props: {
-                    demo: {
-                        type: String,
-                        required: true
-                    }
-                },
-                template:
-                    `<details>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/marked@0.3.6"></script>
+    <script type="text/javascript">
+        Vue.component('how-to-use', {
+            props: {
+                demo: {
+                    type: String,
+                    required: true
+                }
+            },
+            template: `<details>
                         <summary>How to use?</summary>
                         <div class="row">
                                 <div class="col-sm">
@@ -164,48 +167,61 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
                             </div>
                         </div>
                     </details>`
-            });
+        });
 
-            var app = new Vue({
-                el: '#app',
-                data: {
-                    CSV: "Column 1 Header,Column 2 Header\n" +
-                        "Row 1-1,Row 1-2\n" +
-                        "Row 2-1,Row 2-2",
-                    transpose: false,
-                    delim: ',',
-                    enclosure: '"',
-                    separator: '|',
-                    Markdown: ''
-                },
-                methods: {
-                    doConvert() {
-                        var $data = {
-                            task: 'convert',
-                            csv: window.btoa(this.CSV),
-                            transpose: this.transpose,
-                            delim: window.btoa(this.delim),
-                            enclosure: window.btoa(this.enclosure),
-                            separator: window.btoa(this.separator)
-                        }
-                        axios.post('<?php echo basename(__FILE__); ?>', $data)
-                            .then(response => (this.Markdown = window.atob(response.data)))
-                            .catch(function (error) {console.log(error);});
+        var app = new Vue({
+            el: '#app',
+            data: {
+                CSV: "Column 1 Header,Column 2 Header\n" +
+                    "Row 1-1,Row 1-2\n" +
+                    "Row 2-1,Row 2-2",
+                transpose: false,
+                delim: ',',
+                enclosure: '"',
+                separator: '|',
+                Markdown: ''
+            },
+            methods: {
+                doConvert() {
+                    var $data = {
+                        task: 'convert',
+                        csv: window.btoa(this.CSV),
+                        transpose: this.transpose,
+                        delim: window.btoa(this.delim),
+                        enclosure: window.btoa(this.enclosure),
+                        separator: window.btoa(this.separator)
                     }
+                    axios.post('<?php echo basename(__FILE__); ?>', $data)
+                        .then(response => (this.Markdown = window.atob(response.data)))
+                        .catch(function(error) {
+                            console.log(error);
+                        });
                 },
-                computed: {
-                    HTML() {
-                        if (this.Markdown == '') {
-                            return '';
-                        }
-                        // Call marked() to convert the MD string into a HTML table
-                        var mdTable = marked(this.Markdown, { sanitize: true });
-                        // Add Boostrap classes
-                        mdTable = mdTable.replace('<table>', '<table class="table table-hover table-striped">');
-                        return mdTable;
-                    }
+                doChangeTabByComma(event) {
+                    // By copying/pasting from Excel or SSMS (SQL Server Management Studio),
+                    // replace tabs by comma so the conversion is easier.
+                    this.CSV = event.clipboardData.getData('Text');
+                    this.CSV = this.CSV.replace(/	/g, ',')
+                    event.clipboardData.setData('text/plain', this.CSV);
+                    event.preventDefault();
                 }
-            });
-        </script>
-    </body>
+            },
+            computed: {
+                HTML() {
+                    if (this.Markdown == '') {
+                        return '';
+                    }
+                    // Call marked() to convert the MD string into a HTML table
+                    var mdTable = marked(this.Markdown, {
+                        sanitize: true
+                    });
+                    // Add Boostrap classes
+                    mdTable = mdTable.replace('<table>', '<table class="table table-hover table-striped">');
+                    return mdTable;
+                }
+            }
+        });
+    </script>
+</body>
+
 </html>
