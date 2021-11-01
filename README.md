@@ -1,6 +1,6 @@
-![banner](images/banner.jpg)
-
 # marknotes_csv2md
+
+![banner](./banner.svg)
 
 CSV to markdown converter
 
