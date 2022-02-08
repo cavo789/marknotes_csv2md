@@ -146,7 +146,7 @@ if (is_file($cat = __DIR__ . DIRECTORY_SEPARATOR . 'octocat.tmpl')) {
         </div>
     </div>
 
-    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue@2"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://unpkg.com/marked@0.3.6"></script>
     <script type="text/javascript">
